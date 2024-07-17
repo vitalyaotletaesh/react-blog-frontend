@@ -5,13 +5,15 @@ import EyeIcon from '@mui/icons-material/RemoveRedEyeOutlined'
 import IconButton from '@mui/material/IconButton'
 import clsx from 'clsx'
 import React from 'react'
-
-import { useDispatch } from 'react-redux'
 import { Link } from 'react-router-dom'
-import { deletePost } from '../../../redux/postSlice'
+
 import { UserInfo } from '../UserInfo'
 import styles from './Post.module.scss'
 import { PostSkeleton } from './Skeleton'
+import {
+	useDeletePostMutation,
+	useRefetchPostsAndTagsMutation,
+} from '../../../services/mainApi'
 
 export const Post = ({
 	id,
@@ -27,14 +29,22 @@ export const Post = ({
 	isLoading,
 	isEditable,
 }) => {
-	if (isLoading) {
-		return <PostSkeleton />
+	const [deletePost, { error: deletePostError }] = useDeletePostMutation()
+	const [refetch, {error: refetchError}] = useRefetchPostsAndTagsMutation()
+	const onClickRemove = () => {
+		if (deletePostError) {
+			alert('Ошибка при удалении статьи')
+		}
+		deletePost(id)
+		refetch()
+
+		if (refetchError) {
+			alert('Ошибка при refetch posts and tags')
+		}
 	}
 
-	const dispatch = useDispatch()
-
-	const onClickRemove = (id) => {
-		dispatch(deletePost(id))
+	if (isLoading) {
+		return <PostSkeleton />
 	}
 
 	return (
@@ -46,7 +56,7 @@ export const Post = ({
 							<EditIcon />
 						</IconButton>
 					</Link>
-					<IconButton onClick={() => onClickRemove(id)} color='secondary'>
+					<IconButton onClick={onClickRemove} color='secondary'>
 						<DeleteIcon />
 					</IconButton>
 				</div>

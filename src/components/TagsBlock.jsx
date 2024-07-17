@@ -11,6 +11,11 @@ import { Link } from 'react-router-dom'
 import { SideBlock } from './SideBlock'
 
 export const TagsBlock = ({ items, isLoading = true }) => {
+
+	if (!items) {
+		return <div>Error</div>
+	}
+
 	return (
 		<SideBlock title='Тэги'>
 			<List>

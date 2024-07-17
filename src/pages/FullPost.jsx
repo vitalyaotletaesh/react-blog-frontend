@@ -1,47 +1,43 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { useParams } from 'react-router-dom'
 
-import axios from '../../axios'
+import { useGetPostQuery } from '../../services/mainApi'
 import { Index } from '../components/AddComment'
 import { CommentsBlock } from '../components/CommentsBlock'
 import { Post } from '../components/Post'
 
 export const FullPost = () => {
 	const { id } = useParams()
-	const [post, setPost] = useState()
+	const { data, error, isLoading } = useGetPostQuery(id)
 
-	const fetchPost = async () => {
-		const { data } = await axios.get(`/posts/${id}`)
-		setPost(data.post)
-	}
-
-	useEffect(() => {
-		setPost({})
-		fetchPost()
-	}, [])
-
-	if (!post) {
+	if (isLoading) {
 		return <Post isLoading={true} isFullPost={true} />
+	}
+	if (!data) {
+		return <div>Статья не существует</div>
+	}
+	if (error) {
+		return <div>Ошибка при получении статьи</div>
 	}
 
 	return (
 		<>
 			<Post
 				id={1}
-				name={post.name}
-				postImg={post?.postImg ? post.postImg : ''}
+				name={data.post.name}
+				postImg={data.post.postImg ? data.post.postImg : ''}
 				user={{
-					avatarUrl: post.user?.avatarUrl || '',
-					userName: post.user?.userName,
+					avatarUrl: data.post.user?.avatarUrl || '',
+					userName: data.post.user?.userName,
 				}}
-				createdAt={post.createdAt}
-				viewsCount={post.viewsCount}
+				createdAt={data.post.createdAt}
+				viewsCount={data.post.viewsCount}
 				commentsCount={3}
-				tags={post?.tags || []}
+				tags={data.post?.tags || []}
 				isFullPost={true}
 			>
-				<ReactMarkdown children={post.text} />
+				<ReactMarkdown children={data.post.text} />
 			</Post>
 			<CommentsBlock
 				items={[

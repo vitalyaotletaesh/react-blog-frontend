@@ -3,25 +3,20 @@ import Tab from '@mui/material/Tab'
 import Tabs from '@mui/material/Tabs'
 import React from 'react'
 
-import { useDispatch, useSelector } from 'react-redux'
-import { fetchAllPosts, fetchLastTags } from '../../redux/postSlice'
+import { useSelector } from 'react-redux'
+import { useGetLastTagsQuery, useGetPostsQuery } from '../../services/mainApi'
 import { CommentsBlock } from '../components/CommentsBlock'
 import { Post } from '../components/Post'
 import { TagsBlock } from '../components/TagsBlock'
 
 export const Home = () => {
-	const dispatch = useDispatch()
-	const { posts, status, tags } = useSelector((store) => store.posts)
+	const { data, error, isLoading } = useGetPostsQuery()
+	const {
+		data: tags,
+		error: tagsError,
+		isLoading: tagsIsLoading,
+	} = useGetLastTagsQuery()
 	const user = useSelector((store) => store.users.user)
-
-	React.useEffect(() => {
-		dispatch(fetchAllPosts())
-		dispatch(fetchLastTags())
-	}, [])
-
-	React.useEffect(() => {
-		dispatch(fetchAllPosts())
-	}, [])
 
 	return (
 		<>
@@ -35,8 +30,9 @@ export const Home = () => {
 			</Tabs>
 			<Grid container spacing={4}>
 				<Grid xs={8} item>
-					{posts && status === 'fulfilled'
-						? posts.map((post) => (
+					{!error ? (
+						data?.posts && !isLoading ? (
+							data?.posts.map((post) => (
 								<Post
 									key={post._id}
 									id={post._id}
@@ -48,22 +44,23 @@ export const Home = () => {
 									commentsCount={5}
 									tags={post.tags}
 									isFullPost={false}
-									isLoading={status === 'fulfilled' ? false : true}
+									isLoading={isLoading}
 									isEditable={user?._id === post.user._id}
 								/>
-						  ))
-						: [...Array(3)].map((_, i) => (
-								<Post
-									key={i}
-									isLoading={true}
-								/>
-						  ))}
+							))
+						) : (
+							[...Array(3)].map((_, i) => <Post key={i} isLoading={true} />)
+						)
+					) : (
+						<div>Ошибка при получении статей {error}</div>
+					)}
 				</Grid>
 				<Grid xs={4} item>
-					<TagsBlock
-						items={tags}
-						isLoading={status === 'fulfilled' ? false : true}
-					/>
+					{tagsIsLoading ? (
+						<TagsBlock isLoading={isLoading} />
+					) : (
+						<TagsBlock items={tags?.tags} isLoading={isLoading} />
+					)}
 					<CommentsBlock
 						items={[
 							{
@@ -81,7 +78,7 @@ export const Home = () => {
 								text: 'When displaying three lines or more, the avatar is not aligned at the top. You should set the prop to align the avatar at the top',
 							},
 						]}
-						isLoading={status === 'fulfilled' ? false : true}
+						isLoading={isLoading}
 					/>
 				</Grid>
 			</Grid>
