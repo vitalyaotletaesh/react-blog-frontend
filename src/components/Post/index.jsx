@@ -51,14 +51,12 @@ export const Post = ({
 					</IconButton>
 				</div>
 			)}
-			{postImg ? (
+			{postImg && (
 				<img
 					className={clsx(styles.image, { [styles.imageFull]: isFullPost })}
 					src={postImg}
 					alt={name}
 				/>
-			) : (
-				<div className={styles.image}></div>
 			)}
 			<div className={styles.wrapper}>
 				<UserInfo {...user} additionalText={createdAt} />

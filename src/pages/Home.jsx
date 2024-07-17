@@ -12,6 +12,7 @@ import { TagsBlock } from '../components/TagsBlock'
 export const Home = () => {
 	const dispatch = useDispatch()
 	const { posts, status, tags } = useSelector((store) => store.posts)
+	const user = useSelector((store) => store.users.user)
 
 	React.useEffect(() => {
 		dispatch(fetchAllPosts())
@@ -41,14 +42,14 @@ export const Home = () => {
 									id={post._id}
 									name={post.name}
 									createdAt={post.createdAt}
-									postImg={post.postImg}
+									postImg={post.postImg ? post.postImg : ''}
 									user={post.user}
 									viewsCount={post.viewsCount}
 									commentsCount={5}
 									tags={post.tags}
 									isFullPost={false}
 									isLoading={status === 'fulfilled' ? false : true}
-									isEditable={true}
+									isEditable={user?._id === post.user._id}
 								/>
 						  ))
 						: [...Array(3)].map((_, i) => (

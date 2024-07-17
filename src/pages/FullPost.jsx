@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react'
+import ReactMarkdown from 'react-markdown'
 import { useParams } from 'react-router-dom'
 
 import axios from '../../axios'
@@ -29,7 +30,7 @@ export const FullPost = () => {
 			<Post
 				id={1}
 				name={post.name}
-				postImg={post.postImg || ''}
+				postImg={post?.postImg ? post.postImg : ''}
 				user={{
 					avatarUrl: post.user?.avatarUrl || '',
 					userName: post.user?.userName,
@@ -40,7 +41,7 @@ export const FullPost = () => {
 				tags={post?.tags || []}
 				isFullPost={true}
 			>
-				<p>{post.text}</p>
+				<ReactMarkdown children={post.text} />
 			</Post>
 			<CommentsBlock
 				items={[

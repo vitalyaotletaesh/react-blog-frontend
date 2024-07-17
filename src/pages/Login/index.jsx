@@ -68,6 +68,7 @@ export const Login = () => {
 					label='Пароль'
 					error={Boolean(errors.password?.message)}
 					helperText={errors.password?.message}
+					type='password'
 					{...register('password', { required: 'Укажите пароль' })}
 					fullWidth
 				/>

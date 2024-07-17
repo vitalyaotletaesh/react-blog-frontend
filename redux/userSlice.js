@@ -10,7 +10,7 @@ export const login = createAsyncThunk('users/login', async (data) => {
 	}
 })
 
-export const register = createAsyncThunk('users/register', async (data) => {
+export const fetchRegister = createAsyncThunk('users/fetchRegister', async (data) => {
 	try {
 		const response = await axios.post(
 			'/auth/register',
@@ -70,22 +70,22 @@ export const userSlice = createSlice({
 					state.status = 'error'
 				}),
 			builder
-				.addCase(register.pending, (state) => {
+				.addCase(fetchRegister.pending, (state) => {
 					state.status = 'pending'
 					state.user = null
 				})
-				.addCase(register.fulfilled, (state, action) => {
+				.addCase(fetchRegister.fulfilled, (state, action) => {
 					console.log(action.payload)
 					state.user = action.payload
 					state.status = 'fulfilled'
 				})
-				.addCase(register.rejected, (state) => {
+				.addCase(fetchRegister.rejected, (state) => {
 					state.status = 'error'
 				})
 	},
 })
 
-export const authSelector = (state) => Boolean(state.users.user)
+export const authSelector = (state) => Boolean(state.users?.user)
 
 export const { logout } = userSlice.actions
 
