@@ -8,13 +8,24 @@ import SimpleMDE from 'react-simplemde-editor'
 
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import axios from '../../../axios'
 import { authSelector } from '../../../redux/userSlice'
+import {
+	useCreatePostMutation,
+	useGetPostQuery,
+	useUpdatePostMutation,
+	useUploadPostImgMutation,
+} from '../../../services/mainApi'
 import styles from './AddPost.module.scss'
 
 export const AddPost = () => {
 	const navigate = useNavigate()
 	const { id } = useParams()
+	const { data, isLoading } = id
+		? useGetPostQuery(id)
+		: { data: null, isLoading: null }
+	const [createPost] = useCreatePostMutation()
+	const [updatePost] = useUpdatePostMutation()
+	const [uploadPostImg] = useUploadPostImgMutation()
 	const auth = useSelector(authSelector)
 	const [imageUrl, setImageUrl] = useState('')
 	const [value, setValue] = useState('')
@@ -24,7 +35,6 @@ export const AddPost = () => {
 	const isEditMode = Boolean(id)
 
 	useEffect(() => {
-		console.log('img', imageUrl)
 		if (!auth && !window.localStorage.getItem('token')) {
 			redirectToHome()
 		}
@@ -34,9 +44,8 @@ export const AddPost = () => {
 		try {
 			const formData = new FormData()
 			formData.append('image', e.target.files[0])
-			const { data } = await axios.post('/upload', formData)
+			const { data } = await uploadPostImg(formData)
 			setImageUrl(data.url)
-			console.log(data.url, ' aaaaaaaaaaaaaaaaa')
 		} catch (error) {
 			console.warn(error)
 			alert('Ошибка при загрузке файла')
@@ -61,16 +70,12 @@ export const AddPost = () => {
 			const fields = {
 				name: name,
 				text: value,
-				postImg: isEditMode
-					? imageUrl
-					: imageUrl
-					? import.meta.env.VITE_API_URL + imageUrl
-					: '',
+				postImg: imageUrl ? import.meta.env.VITE_API_URL + imageUrl : '',
 				tags: tags.split(','),
 			}
 			const { data } = isEditMode
-				? await axios.patch(`/posts/${id}`, fields)
-				: await axios.post('/posts', fields)
+				? await updatePost({ fields, id })
+				: await createPost(fields)
 			const _id = isEditMode ? id : data.post._id
 			navigate(`/posts/${_id}`)
 		} catch (error) {
@@ -83,13 +88,15 @@ export const AddPost = () => {
 
 	const fetchPost = async () => {
 		try {
-			const { data } = await axios.get(`/posts/${id}`)
-			setImageUrl(data.post.postImg)
-			setValue(data.post.text)
-			setTags(data.post.tags?.join(','))
-			setName(data.post.name)
+			let postImg
+			!isLoading &&
+				((postImg = data.post.postImg.replace('http://localhost:4444', '')),
+				setImageUrl(postImg),
+				setValue(data.post.text),
+				setTags(data.post.tags?.join(',')),
+				setName(data.post.name))
 		} catch (error) {
-			console.log(error)
+			console.warn(error)
 		}
 	}
 
@@ -97,7 +104,7 @@ export const AddPost = () => {
 		if (isEditMode) {
 			fetchPost()
 		}
-	}, [])
+	}, [data])
 
 	const options = React.useMemo(
 		() => ({
@@ -108,7 +115,6 @@ export const AddPost = () => {
 			status: false,
 			autosave: {
 				enabled: true,
-				// uniqueId: "demo",
 				delay: 1000,
 			},
 		}),
@@ -143,7 +149,7 @@ export const AddPost = () => {
 			{imageUrl && (
 				<img
 					className={styles.image}
-					src={isEditMode ? imageUrl : `http://localhost:4444${imageUrl}`}
+					src={`http://localhost:4444${imageUrl}`}
 					alt='Uploaded'
 				/>
 			)}

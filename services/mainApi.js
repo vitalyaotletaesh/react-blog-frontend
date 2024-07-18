@@ -39,14 +39,39 @@ export const mainApi = createApi({
 					return { error }
 				}
 			},
-			invalidatesTags: (result, error, id) => [
-				{ type: 'Post', id },
-				{ type: 'Tag', id },
-			],
-		}),
-		refetchPostsAndTags: builder.mutation({
-			queryFn: () => ({ data: null }),
 			invalidatesTags: ['Post', 'Tag'],
+		}),
+		createPost: builder.mutation({
+			queryFn: async (body) => {
+				try {
+					const { data } = await axios.post(`/posts`, body)
+					return { data }
+				} catch (error) {
+					return { error }
+				}
+			},
+			invalidatesTags: ['Post', 'Tag'],
+		}),
+		updatePost: builder.mutation({
+			queryFn: async ({fields, id}) => {
+				try {
+					const { data } = await axios.patch(`/posts/${id}`, fields)
+					return { data }
+				} catch (error) {
+					return { error }
+				}
+			},
+			invalidatesTags: ['Post', 'Tag'],
+		}),
+		uploadPostImg: builder.mutation({
+			queryFn: async (body) => {
+				try {
+					const { data } = await axios.post('/upload', body)
+					return { data }
+				} catch (error) {
+					return { error }
+				}
+			},
 		}),
 	}),
 })
@@ -56,5 +81,7 @@ export const {
 	useDeletePostMutation,
 	useGetPostQuery,
 	useGetLastTagsQuery,
-	useRefetchPostsAndTagsMutation,
+	useCreatePostMutation,
+	useUpdatePostMutation,
+	useUploadPostImgMutation,
 } = mainApi

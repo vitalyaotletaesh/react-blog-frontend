@@ -7,13 +7,10 @@ import clsx from 'clsx'
 import React from 'react'
 import { Link } from 'react-router-dom'
 
+import { useDeletePostMutation } from '../../../services/mainApi'
 import { UserInfo } from '../UserInfo'
 import styles from './Post.module.scss'
 import { PostSkeleton } from './Skeleton'
-import {
-	useDeletePostMutation,
-	useRefetchPostsAndTagsMutation,
-} from '../../../services/mainApi'
 
 export const Post = ({
 	id,
@@ -30,13 +27,11 @@ export const Post = ({
 	isEditable,
 }) => {
 	const [deletePost, { error: deletePostError }] = useDeletePostMutation()
-	const [refetch, {error: refetchError}] = useRefetchPostsAndTagsMutation()
 	const onClickRemove = () => {
 		if (deletePostError) {
 			alert('Ошибка при удалении статьи')
 		}
 		deletePost(id)
-		refetch()
 
 		if (refetchError) {
 			alert('Ошибка при refetch posts and tags')
