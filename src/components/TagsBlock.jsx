@@ -7,37 +7,30 @@ import ListItemText from '@mui/material/ListItemText'
 import Skeleton from '@mui/material/Skeleton'
 import React from 'react'
 
-import { Link } from 'react-router-dom'
 import { SideBlock } from './SideBlock'
 
-export const TagsBlock = ({ items, isLoading = true }) => {
-
-	if (!items) {
-		return <div>Error</div>
-	}
-
+export const TagsBlock = ({
+	items,
+	isLoading = true,
+	onClick,
+	selectedTag = null,
+}) => {
 	return (
 		<SideBlock title='Тэги'>
 			<List>
 				{(isLoading ? [...Array(5)] : items).map((name, i) => (
-					<Link
-						key={i}
-						style={{ textDecoration: 'none', color: 'black' }}
-						to={`/tags/${name}`}
-					>
-						<ListItem key={i} disablePadding>
-							<ListItemButton>
-								<ListItemIcon>
-									<TagIcon />
-								</ListItemIcon>
-								{isLoading ? (
-									<Skeleton width={100} />
-								) : (
-									<ListItemText primary={name} />
-								)}
-							</ListItemButton>
-						</ListItem>
-					</Link>
+					<ListItem key={i} disablePadding onClick={() => onClick(name)}>
+						<ListItemButton selected={name === selectedTag}>
+							<ListItemIcon>
+								<TagIcon />
+							</ListItemIcon>
+							{isLoading ? (
+								<Skeleton width={100} />
+							) : (
+								<ListItemText primary={name} />
+							)}
+						</ListItemButton>
+					</ListItem>
 				))}
 			</List>
 		</SideBlock>

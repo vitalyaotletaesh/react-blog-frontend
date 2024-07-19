@@ -1,6 +1,6 @@
-export { Home } from "./Home";
-export { FullPost } from "./FullPost";
-export { AddPost } from "./AddPost";
-export { Registration } from "./Registration";
-export { Login } from "./Login";
-export { NotFound } from "./NotFound";
+export { AddPost } from './AddPost'
+export { FullPost } from './FullPost'
+export { Home } from './Home'
+export { Login } from './Login'
+export { NotFound } from './NotFound'
+export { Registration } from './Registration'

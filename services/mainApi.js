@@ -7,7 +7,10 @@ export const mainApi = createApi({
 	tagTypes: ['Post', 'Tag'],
 	endpoints: (builder) => ({
 		getPosts: builder.query({
-			query: () => '/posts',
+			query: (filters) => ({
+				url: `/posts`,
+				params: { tag: filters?.tag, sort: filters?.sort },
+			}),
 			providesTags: (result) =>
 				result
 					? [
@@ -53,7 +56,7 @@ export const mainApi = createApi({
 			invalidatesTags: ['Post', 'Tag'],
 		}),
 		updatePost: builder.mutation({
-			queryFn: async ({fields, id}) => {
+			queryFn: async ({ fields, id }) => {
 				try {
 					const { data } = await axios.patch(`/posts/${id}`, fields)
 					return { data }

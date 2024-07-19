@@ -1,15 +1,14 @@
 import Container from '@mui/material/Container'
 import { useEffect } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { Route, Routes } from 'react-router-dom'
 
-import { authSelector, getMe } from '../redux/userSlice'
+import { getMe } from '../redux/userSlice'
 import { Header } from './components'
 import { AddPost, FullPost, Home, Login, NotFound, Registration } from './pages'
 
 function App() {
 	const dispatch = useDispatch()
-	const auth = useSelector(authSelector)
 
 	useEffect(() => {
 		dispatch(getMe())

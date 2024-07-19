@@ -1,66 +1,60 @@
 import Grid from '@mui/material/Grid'
-import Tab from '@mui/material/Tab'
-import Tabs from '@mui/material/Tabs'
-import React from 'react'
-
+import React, { useState } from 'react'
 import { useSelector } from 'react-redux'
+
 import { useGetLastTagsQuery, useGetPostsQuery } from '../../services/mainApi'
 import { CommentsBlock } from '../components/CommentsBlock'
-import { Post } from '../components/Post'
+import { CustomTabs } from '../components/CustomTabs'
+import { PostsList } from '../components/Lists/PostsList'
 import { TagsBlock } from '../components/TagsBlock'
 
+const filters = [
+	JSON.stringify({ sort: { createdAt: -1 } }),
+	JSON.stringify({ sort: { viewsCount: -1 } }),
+]
+
 export const Home = () => {
-	const { data, error, isLoading } = useGetPostsQuery()
-	const {
-		data: tags,
-		error: tagsError,
-		isLoading: tagsIsLoading,
-	} = useGetLastTagsQuery()
+	const [tag, setTag] = useState()
+	const [sort, setSort] = useState(filters[0])
+	const [tab, setTab] = useState('Новые')
+	const { data, error, isLoading } = useGetPostsQuery({ tag, sort })
+	const { data: tags, isLoading: tagsIsLoading } = useGetLastTagsQuery()
 	const user = useSelector((store) => store.users.user)
+
+	const handleTagSelected = (selectedTag) => {
+		if (tag === selectedTag) {
+			setTag(undefined)
+		} else {
+			setTag(selectedTag)
+		}
+	}
+
+	const handleTabClick = (tab) => {
+		setTab(tab)
+		tab === 'Новые' ? setSort(filters[0]) : setSort(filters[1])
+	}
 
 	return (
 		<>
-			<Tabs
-				style={{ marginBottom: 15 }}
-				value={0}
-				aria-label='basic tabs example'
-			>
-				<Tab label='Новые' />
-				<Tab label='Популярные' />
-			</Tabs>
+			<CustomTabs
+				tabs={['Новые', 'Популярные']}
+				onClick={handleTabClick}
+				selectedIndex={tab}
+			/>
 			<Grid container spacing={4}>
-				<Grid xs={8} item>
-					{!error ? (
-						data?.posts && !isLoading ? (
-							data?.posts.map((post) => (
-								<Post
-									key={post._id}
-									id={post._id}
-									name={post.name}
-									createdAt={post.createdAt}
-									postImg={post.postImg ? post.postImg : ''}
-									user={post.user}
-									viewsCount={post.viewsCount}
-									commentsCount={5}
-									tags={post.tags}
-									isFullPost={false}
-									isLoading={isLoading}
-									isEditable={user?._id === post.user._id}
-								/>
-							))
-						) : (
-							[...Array(3)].map((_, i) => <Post key={i} isLoading={true} />)
-						)
-					) : (
-						<div>Ошибка при получении статей {error}</div>
-					)}
-				</Grid>
+				<PostsList
+					data={data}
+					error={error}
+					isLoading={isLoading}
+					user={user}
+				/>
 				<Grid xs={4} item>
-					{tagsIsLoading ? (
-						<TagsBlock isLoading={isLoading} />
-					) : (
-						<TagsBlock items={tags?.tags} isLoading={isLoading} />
-					)}
+					<TagsBlock
+						items={tags?.tags}
+						isLoading={tagsIsLoading}
+						onClick={handleTagSelected}
+						selectedTag={tag}
+					/>
 					<CommentsBlock
 						items={[
 							{
