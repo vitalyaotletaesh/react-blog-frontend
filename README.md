@@ -1,8 +1,25 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+# Блог React Blog
+## Frontend
+### - JavaScript
+### - React
+### - Redux Toolkit
+### - RTK Query
+### - MUI
+### - React Hook Form
+### - React router dom
+### - Axios
+### - EasyMDE
+## Backend (https://github.com/vitalyaotletaesh/react-blog-backend)
+### - Express
+### - Mongoose
+### - JWT
+### - Bcrypt
+### - Cors
+## В данном проекте был реализован следующий функционал: 
+### - CRUD статей, комментариев и лайков на бэкенде
+### - Авторизация, регистрация, аутентификация (бэк и фронт)
+### - Просмотр статей и комментариев для всех юзеров
+### - Создание/редактирование/удаление статьи ее автором
+### - Создание/удаление комментария его автором
+### - Лайк/Снятие комментария аутентифицированным юзером
+### - Получение Новых/Популярных статей
